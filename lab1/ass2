@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ghat — route notes for the Western Ghats</title>
+<meta name="description" content="Six monsoon routes through the Western Ghats, with the ascent, the turnaround time, and the part nobody tells you about.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Barlow+Condensed:wght@500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   TOKENS
+   Palette taken from the subject: wet basalt, moss, laterite mud,
+   low cloud, and the yellow of a rain slicker. Yellow is reserved
+   strictly for things you can act on.
+   ============================================================ */
+:root {
+  --ink:      #14231F;
+  --ink-soft: #4A5C56;
+  --moss:     #3C6B57;
+  --moss-soft:#D7E2DA;
+  --mist:     #E9EDE8;
+  --paper:    #F7F9F6;
+  --slicker:  #EFB700;
+  --slicker-deep: #D9A600;
+  --laterite: #A6462A;
+  --hairline: #C4D0C8;
+
+  --display: "Fraunces", Georgia, "Times New Roman", serif;
+  --utility: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Fluid type. One clamp per role instead of a stack of breakpoints. */
+  --t-h1:   clamp(2.1rem, 1.2rem + 4.2vw, 3.6rem);
+  --t-h2:   clamp(1.55rem, 1.2rem + 1.4vw, 2.1rem);
+  --t-h3:   clamp(1.05rem, 0.98rem + 0.4vw, 1.28rem);
+  --t-body: clamp(0.95rem, 0.92rem + 0.18vw, 1.02rem);
+
+  --gutter: clamp(1.1rem, 0.6rem + 2.2vw, 2.4rem);
+  --measure: 1180px;
+  --r-sm: 6px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --shadow: 0 6px 18px rgb(20 35 31 / 0.09);
+  --ease: cubic-bezier(.2,.7,.3,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--mist);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 600; margin: 0; letter-spacing: -0.02em; }
+p { margin: 0; }
+button, input { font: inherit; color: inherit; }
+
+.wrap { width: min(100% - var(--gutter) * 2, var(--measure)); margin-inline: auto; }
+.eyebrow {
+  font-family: var(--utility);
+  font-size: .78rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--moss);
+}
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0;
+  margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* ============================================================
+   STICKY BAR
+   ============================================================ */
+.bar {
+  position: sticky; top: 0; z-index: 40;
+  background: color-mix(in srgb, var(--mist) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .2s var(--ease);
+}
+.bar[data-scrolled] { border-bottom-color: var(--hairline); }
+.bar__inner { display: flex; align-items: center; gap: 1rem; height: 60px; }
+.brand { display: flex; align-items: center; gap: .55rem; font-family: var(--display); font-size: 1.2rem; }
+.brand::before {
+  content: ""; width: 14px; height: 14px;
+  background: var(--slicker); border: 1px solid var(--ink); rotate: 45deg;
+}
+.bar__title {
+  flex: 1;
+  font-family: var(--utility); font-size: .78rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-soft);
+  opacity: 0; translate: 0 8px;
+  transition: opacity .25s var(--ease), translate .25s var(--ease);
+}
+.bar[data-scrolled] .bar__title { opacity: 1; translate: 0 0; }
+.bar__btn {
+  margin-left: auto;
+  font-family: var(--utility); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase;
+  background: none; border: 1px solid var(--hairline); border-radius: 999px;
+  padding: .45rem 1rem; cursor: pointer;
+  transition: background .18s var(--ease), border-color .18s var(--ease);
+}
+.bar__btn:hover { background: var(--moss-soft); border-color: var(--moss); }
+@media (max-width: 640px) { .bar__btn { display: none; } .bar__title { text-align: right; } }
+
+/* ============================================================
+   HERO — grid splits only when there is room for both tracks
+   ============================================================ */
+.hero { display: grid; gap: clamp(2rem, 5vw, 3.5rem); padding: clamp(2.5rem, 6vw, 4.5rem) 0; }
+@media (min-width: 800px) { .hero { grid-template-columns: 1.05fr 1fr; align-items: center; } }
+
+.hero h1 { font-size: var(--t-h1); line-height: 1.02; margin: .8rem 0 0; }
+.hero h1 .break { display: block; }
+.hero__lede { color: var(--ink-soft); font-size: 1.05rem; line-height: 1.6; max-width: 46ch; margin-top: 1.1rem; }
+.hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1.8rem; }
+.hero__note { font-size: .82rem; color: var(--ink-soft); }
+
+.cta {
+  font-family: var(--utility); font-size: .88rem; letter-spacing: .12em; text-transform: uppercase;
+  background: var(--ink); color: var(--slicker);
+  border: 1px solid var(--ink); border-radius: var(--r-sm);
+  padding: .85rem 1.6rem; cursor: pointer;
+  transition: background .18s var(--ease), translate .18s var(--ease);
+}
+.cta:hover { background: var(--moss); border-color: var(--moss); }
+.cta:active { translate: 0 1px; }
+
+/* ============================================================
+   SIGNATURE — elevation profile
+   Flex row, bars aligned to a shared baseline, each a real button.
+   ============================================================ */
+.profile {
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  padding: clamp(1.1rem, 3vw, 1.6rem);
+}
+.profile__cap {
+  font-family: var(--utility); font-size: .72rem; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-soft); margin-bottom: 1rem;
+}
+.profile__readout { display: flex; align-items: flex-end; gap: 1rem; margin-bottom: 1rem; }
+.profile__stage { font-family: var(--display); font-size: var(--t-h3); line-height: 1.25; }
+.profile__figs { margin-left: auto; text-align: right; flex: none; }
+.profile__m { font-family: var(--utility); font-size: 1.7rem; letter-spacing: .02em; line-height: 1; }
+.profile__m span { font-size: .85rem; color: var(--ink-soft); }
+.profile__km { font-size: .8rem; color: var(--ink-soft); }
+
+.profile__chart {
+  display: flex; align-items: flex-end; gap: 4px;
+  height: var(--chart-h, 180px);
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: .5rem;
+}
+.col {
+  flex: 1; display: flex; flex-direction: column; justify-content: flex-end;
+  height: 100%; background: none; border: 0; padding: 0;
+  border-radius: var(--r-sm); cursor: pointer;
+}
+.col:hover { background: var(--moss-soft); }
+.col__fill {
+  height: var(--h);
+  background: var(--moss-soft);
+  border: 1px solid var(--hairline); border-bottom: 0;
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+  transform-origin: bottom;
+  animation: grow .42s var(--ease) backwards;
+  animation-delay: calc(var(--i) * 55ms);
+  transition: background .16s var(--ease), border-color .16s var(--ease);
+}
+.col[aria-pressed="true"] .col__fill { background: var(--slicker); border-color: var(--ink); }
+.col__tick { font-size: .68rem; color: var(--ink-soft); margin-top: .35rem; }
+.col[aria-pressed="true"] .col__tick { color: var(--ink); font-weight: 700; }
+@keyframes grow { from { scale: 1 0; } to { scale: 1 1; } }
+
+.profile__axis {
+  display: flex; justify-content: space-between; margin-top: .5rem;
+  font-family: var(--utility); font-size: .7rem; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--ink-soft);
+}
+@media (max-width: 560px) { .col__tick { display: none; } }
+
+/* ============================================================
+   TABS
+   ============================================================ */
+.tabs {
+  display: inline-flex; gap: 4px; padding: 4px;
+  background: var(--moss-soft); border-radius: 999px;
+  max-width: 100%; overflow-x: auto; scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  font-family: var(--utility); font-size: .82rem; letter-spacing: .12em; text-transform: uppercase;
+  background: none; border: 0; border-radius: 999px;
+  padding: .55rem 1.2rem; white-space: nowrap; cursor: pointer; color: var(--moss);
+  transition: background .18s var(--ease), color .18s var(--ease);
+}
+.tab:hover { background: rgb(255 255 255 / .6); }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+
+.panel { padding-block: 2rem 3.5rem; }
+.panel[hidden] { display: none; }
+
+/* ============================================================
+   TRAIL GRID — auto-fit means the column count is emergent,
+   not hard-coded to a breakpoint. Cards use a container query
+   so they lay out by their own width, not the viewport's.
+   ============================================================ */
+.grid {
+  display: grid; gap: var(--gutter);
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+}
+.card {
+  position: relative;
+  container-type: inline-size;
+  display: flex; flex-direction: column;
+  background: var(--paper);
+  border: 1px solid var(--hairline); border-radius: var(--r-md);
+  padding: 1.5rem; text-align: left; cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: translate .18s var(--ease), border-color .18s var(--ease), box-shadow .18s var(--ease);
+}
+.card:has(.card__link:focus-visible) { border-color: var(--moss); outline: 2px solid var(--ink); outline-offset: 2px; }
+.card__link {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0;
+  text-align: left; cursor: pointer;
+}
+/* The heading button is the only control, but the whole card is its hit area. */
+.card__link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.card__link:focus-visible { outline: none; }
+.card:hover { translate: 0 -3px; border-color: var(--moss); box-shadow: 0 12px 26px rgb(20 35 31 / .13); }
+.card:active { translate: 0 0; }
+.card__head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-bottom: .8rem; }
+.chip-grade {
+  font-family: var(--utility); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase;
+  background: var(--moss-soft); color: var(--moss);
+  padding: .18rem .7rem; border-radius: 999px; white-space: nowrap;
+}
+.chip-grade[data-hard] { background: var(--laterite); color: var(--paper); }
+.card h3 { font-size: var(--t-h3); margin-bottom: .45rem; }
+.card__blurb { font-size: .87rem; color: var(--ink-soft); margin-bottom: 1.4rem; }
+
+.stats {
+  display: flex; align-items: center; gap: 1rem;
+  margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--hairline);
+}
+.stat { flex: 1; }
+.stat b { font-family: var(--utility); font-weight: 600; font-size: 1.15rem; letter-spacing: .02em; }
+.stat b span { font-size: .75rem; color: var(--ink-soft); }
+.stat small { display: block; font-size: .7rem; color: var(--ink-soft); }
+.card__permit { font-size: .72rem; color: var(--laterite); margin-top: .7rem; }
+
+/* Once a card itself is wide enough, the stats spread out. */
+@container (min-width: 420px) { .stats { gap: 1.8rem; } .card { padding: 1.8rem; } }
+
+/* ============================================================
+   GEAR
+   ============================================================ */
+.gear { background: var(--paper); border: 1px solid var(--hairline); border-radius: var(--r-lg); padding-inline: clamp(1.1rem, 3vw, 1.7rem); }
+.gear li { display: flex; gap: 1rem; padding-block: 1.35rem; border-bottom: 1px solid var(--hairline); }
+.gear li:last-child { border-bottom: 0; }
+.gear ol, .gear ul { list-style: none; margin: 0; padding: 0; }
+.gear__n {
+  flex: none; width: 30px; height: 30px; display: grid; place-items: center;
+  background: var(--moss-soft); color: var(--moss); border-radius: var(--r-sm);
+  font-family: var(--utility); font-size: .8rem;
+}
+.gear__item { font-family: var(--display); font-size: 1.02rem; line-height: 1.35; }
+.gear__why { font-size: .85rem; color: var(--ink-soft); margin-top: .15rem; }
+
+/* ============================================================
+   ACCORDION
+   Height animates with grid-template-rows 0fr -> 1fr, which needs
+   no measured pixel height and no JavaScript.
+   ============================================================ */
+.acc { border-top: 1px solid var(--hairline); }
+.acc__item { border-bottom: 1px solid var(--hairline); }
+.acc__item[data-open] { background: var(--paper); }
+.acc__btn {
+  width: 100%; display: flex; align-items: center; gap: 1rem;
+  background: none; border: 0; padding: 1.35rem 1rem; cursor: pointer; text-align: left;
+  transition: background .18s var(--ease);
+}
+.acc__btn:hover { background: var(--moss-soft); }
+.acc__q { flex: 1; font-family: var(--display); font-size: 1.05rem; line-height: 1.35; color: var(--ink-soft); }
+.acc__item[data-open] .acc__q { color: var(--ink); }
+.acc__mark {
+  flex: none; position: relative; width: 26px; height: 26px;
+  background: var(--moss-soft); border-radius: var(--r-sm);
+  transition: background .2s var(--ease);
+}
+.acc__item[data-open] .acc__mark { background: var(--slicker); }
+.acc__mark::before, .acc__mark::after {
+  content: ""; position: absolute; inset: 50% 7px auto; height: 2px;
+  background: var(--ink); translate: 0 -1px;
+}
+.acc__mark::after { rotate: 90deg; transition: rotate .22s var(--ease); }
+.acc__item[data-open] .acc__mark::after { rotate: 0deg; }
+
+.acc__panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .26s var(--ease); }
+.acc__item[data-open] .acc__panel { grid-template-rows: 1fr; }
+.acc__panel > div { overflow: hidden; }
+.acc__panel p { color: var(--ink-soft); padding: 0 3rem 1.5rem 1rem; max-width: 70ch; }
+
+/* ============================================================
+   FORM
+   ============================================================ */
+.form { background: var(--paper); border: 1px solid var(--hairline); border-radius: var(--r-lg); padding: clamp(1.4rem, 4vw, 2.4rem); }
+.form h2 { font-size: var(--t-h2); margin: .5rem 0 .7rem; }
+.form__lede { color: var(--ink-soft); max-width: 58ch; margin-bottom: 2rem; }
+
+.row { display: grid; gap: 1.4rem; margin-bottom: 1.4rem; }
+@media (min-width: 700px) { .row { grid-template-columns: 1fr 1fr; } }
+
+label, .label {
+  display: block;
+  font-family: var(--utility); font-size: .76rem; letter-spacing: .13em;
+  text-transform: uppercase; margin-bottom: .5rem;
+}
+input[type="text"], input[type="email"] {
+  width: 100%; background: var(--mist);
+  border: 1px solid var(--hairline); border-radius: var(--r-sm);
+  padding: .75rem .9rem; min-height: 46px;
+}
+input[aria-invalid="true"] { border-color: var(--laterite); background: #FBEDE9; }
+.err { display: block; font-size: .78rem; color: var(--laterite); margin-top: .45rem; min-height: 1px; }
+.help { font-size: .78rem; color: var(--ink-soft); margin-top: .5rem; }
+
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.6rem; }
+.chip {
+  background: var(--mist); border: 1px solid var(--hairline); border-radius: 999px;
+  padding: .55rem 1rem; font-size: .85rem; color: var(--ink-soft); cursor: pointer;
+  transition: background .16s var(--ease), color .16s var(--ease), border-color .16s var(--ease);
+}
+.chip:hover { border-color: var(--moss); }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+
+.stepper { display: flex; align-items: center; gap: .7rem; }
+.step {
+  width: 44px; height: 44px; display: grid; place-items: center;
+  background: var(--mist); border: 1px solid var(--hairline); border-radius: var(--r-sm);
+  font-family: var(--utility); font-size: 1.35rem; cursor: pointer;
+  transition: background .16s var(--ease), border-color .16s var(--ease);
+}
+.step:hover:not(:disabled) { border-color: var(--moss); background: var(--moss-soft); }
+.step:disabled { opacity: .4; cursor: not-allowed; }
+.stepper output { font-family: var(--utility); font-size: 1.5rem; min-width: 2.2rem; text-align: center; }
+
+.switch { display: flex; align-items: center; gap: .8rem; min-height: 44px; }
+.switch input { appearance: none; width: 48px; height: 28px; border-radius: 999px; background: var(--hairline); position: relative; cursor: pointer; margin: 0; transition: background .2s var(--ease); }
+.switch input::after { content: ""; position: absolute; inset: 3px auto 3px 3px; width: 22px; border-radius: 999px; background: var(--paper); transition: translate .2s var(--ease); }
+.switch input:checked { background: var(--moss); }
+.switch input:checked::after { translate: 20px 0; }
+.switch__text {
+  margin: 0; font-family: var(--body); font-size: .88rem;
+  letter-spacing: 0; text-transform: none; cursor: pointer;
+}
+.warn { font-size: .8rem; color: var(--laterite); margin-top: .5rem; }
+
+.submit {
+  font-family: var(--utility); font-size: .88rem; letter-spacing: .12em; text-transform: uppercase;
+  background: var(--slicker); color: var(--ink);
+  border: 1px solid var(--ink); border-radius: var(--r-sm);
+  padding: .85rem 1.8rem; cursor: pointer; margin-top: .5rem;
+  transition: background .18s var(--ease), translate .1s var(--ease);
+}
+.submit:hover { background: var(--slicker-deep); }
+.submit:active { translate: 0 1px; }
+.form__error { color: var(--laterite); font-size: .85rem; margin-top: 1rem; }
+.receipt {
+  margin-top: 1.4rem; padding: 1rem;
+  background: var(--moss-soft); border-left: 3px solid var(--moss); border-radius: var(--r-md);
+}
+.receipt b { display: block; font-family: var(--utility); font-size: .78rem; letter-spacing: .13em; text-transform: uppercase; color: var(--moss); margin-bottom: .35rem; }
+.receipt p { font-size: .88rem; }
+
+/* ============================================================
+   DIALOG — bottom sheet on a phone, centred panel above that
+   ============================================================ */
+dialog.sheet {
+  border: 0; padding: 0; background: var(--mist);
+  color: var(--ink); max-height: 88dvh; width: 100%;
+  margin: auto auto 0; border-radius: var(--r-lg) var(--r-lg) 0 0;
+  overflow: hidden;
+}
+dialog.sheet::backdrop { background: rgb(20 35 31 / .55); backdrop-filter: blur(2px); }
+dialog.sheet[open] { display: flex; flex-direction: column; animation: rise .28s var(--ease); }
+@keyframes rise { from { translate: 0 24px; opacity: 0; } }
+@media (min-width: 700px) {
+  dialog.sheet { margin: auto; width: min(92%, 680px); max-height: 84dvh; border-radius: var(--r-lg); }
+  @keyframes rise { from { scale: .97; opacity: 0; } }
+}
+.sheet__head {
+  display: flex; align-items: flex-start; gap: 1rem;
+  padding: 1.4rem 1.4rem 1.1rem; border-bottom: 1px solid var(--hairline);
+}
+.sheet__head h2 { font-size: var(--t-h2); margin-top: .3rem; }
+.sheet__close {
+  margin-left: auto; flex: none;
+  font-family: var(--utility); font-size: .76rem; letter-spacing: .12em; text-transform: uppercase;
+  background: none; border: 1px solid var(--hairline); border-radius: 999px;
+  padding: .4rem 1rem; cursor: pointer;
+}
+.sheet__close:hover { background: var(--moss-soft); border-color: var(--moss); }
+.sheet__body { overflow-y: auto; padding: 1.4rem; }
+.sheet__meta { display: flex; flex-wrap: wrap; gap: 1.5rem; margin: 1.3rem 0 2rem; }
+.sheet__meta div small { display: block; font-family: var(--utility); font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--ink-soft); }
+.sheet__meta div b { font-family: var(--utility); font-weight: 600; font-size: 1.1rem; }
+.sheet__note {
+  margin-top: 1.6rem; padding: 1rem;
+  background: var(--paper); border-left: 3px solid var(--slicker); border-radius: var(--r-md);
+  font-size: .88rem;
+}
+
+footer { border-top: 1px solid var(--hairline); padding-block: 1.6rem 3rem; }
+footer p { font-size: .8rem; color: var(--ink-soft); max-width: 60ch; }
+
+/* ============================================================
+   Scroll reveal + reduced motion
+   ============================================================ */
+.reveal { opacity: 0; translate: 0 14px; transition: opacity .5s var(--ease), translate .5s var(--ease); }
+.reveal.in { opacity: 1; translate: 0 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: .01ms !important;
+  }
+  .reveal { opacity: 1; translate: none; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="bar" id="bar">
+  <div class="bar__inner wrap">
+    <a class="brand" href="#top" aria-label="Ghat, home">Ghat</a>
+    <span class="bar__title">Western Ghats · monsoon season</span>
+    <button class="bar__btn" type="button">Permit status</button>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero wrap">
+    <div>
+      <p class="eyebrow">June – September · Karnataka</p>
+      <h1><span class="break">The good ridges are</span> the ones in cloud.</h1>
+      <p class="hero__lede">
+        Six routes through the Western Ghats, with the ascent, the turnaround time, and the part
+        nobody tells you about. Written by people who walked them in the rain.
+      </p>
+      <div class="hero__actions">
+        <button class="cta" type="button" id="openFeatured">Open a route</button>
+        <span class="hero__note">Permits capped daily · book two weeks out</span>
+      </div>
+    </div>
+
+    <!-- Signature element -->
+    <div class="profile" id="heroProfile" style="--chart-h: 180px">
+      <p class="profile__cap" data-cap>Profile</p>
+      <div class="profile__readout">
+        <div>
+          <p class="eyebrow" data-stage-n></p>
+          <p class="profile__stage" data-stage-label></p>
+        </div>
+        <div class="profile__figs">
+          <p class="profile__m" data-metres></p>
+          <p class="profile__km" data-km></p>
+        </div>
+      </div>
+      <div class="profile__chart" role="group" aria-label="Elevation profile, select a stage" data-chart></div>
+      <div class="profile__axis"><span>Distance, km</span><span data-peak></span></div>
+    </div>
+  </section>
+
+  <!-- TABS -->
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-routes" aria-controls="panel-routes" aria-selected="true">Routes</button>
+      <button class="tab" role="tab" id="tab-gear"   aria-controls="panel-gear"   aria-selected="false" tabindex="-1">Gear</button>
+      <button class="tab" role="tab" id="tab-brief"  aria-controls="panel-brief"  aria-selected="false" tabindex="-1">Before you go</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="panel" id="panel-routes" role="tabpanel" aria-labelledby="tab-routes" tabindex="0">
+      <h2 class="sr-only">Routes</h2>
+      <div class="grid" id="grid"></div>
+    </section>
+
+    <section class="panel" id="panel-gear" role="tabpanel" aria-labelledby="tab-gear" tabindex="0" hidden>
+      <h2 class="sr-only">Gear</h2>
+      <div class="gear"><ol id="gearList"></ol></div>
+    </section>
+
+    <section class="panel" id="panel-brief" role="tabpanel" aria-labelledby="tab-brief" tabindex="0" hidden>
+      <h2 class="sr-only">Before you go</h2>
+      <div class="acc" id="acc"></div>
+    </section>
+  </div>
+
+  <!-- BOOKING -->
+  <section class="wrap reveal" style="padding-bottom:3.5rem">
+    <form class="form" id="form" novalidate>
+      <p class="eyebrow">Request a slot</p>
+      <h2>Hold a place on a guided departure</h2>
+      <p class="form__lede">
+        Permits are capped daily. We confirm within two working days and the fee is collected at the
+        range office, not here.
+      </p>
+
+      <div class="row">
+        <div>
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" autocomplete="name" aria-describedby="name-err">
+          <span class="err" id="name-err"></span>
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" aria-describedby="email-err">
+          <span class="err" id="email-err"></span>
+        </div>
+      </div>
+
+      <p class="label" id="routeLabel">Route</p>
+      <div class="chips" id="chips" role="group" aria-labelledby="routeLabel"></div>
+
+      <div class="row">
+        <div>
+          <p class="label" id="groupLabel">Group size</p>
+          <div class="stepper" role="group" aria-labelledby="groupLabel">
+            <button class="step" type="button" id="minus" aria-label="Remove one person">&minus;</button>
+            <output id="group" aria-live="polite">2</output>
+            <button class="step" type="button" id="plus" aria-label="Add one person">+</button>
+          </div>
+          <p class="help">Twelve is the sanctuary limit per guide.</p>
+        </div>
+        <div>
+          <p class="label">Guide</p>
+          <div class="switch">
+            <input type="checkbox" id="guide" role="switch" checked>
+            <label class="switch__text" for="guide" id="guideText">Registered guide included</label>
+          </div>
+          <p class="warn" id="guideWarn" hidden></p>
+        </div>
+      </div>
+
+      <button class="submit" type="submit">Request a slot</button>
+      <p class="form__error" id="formError" hidden role="alert"></p>
+      <div class="receipt" id="receipt" hidden aria-live="polite"></div>
+    </form>
+  </section>
+
+  <footer class="wrap">
+    <p>
+      Ghat · route notes for the Western Ghats. Conditions change daily — always confirm with the
+      range office before you travel.
+    </p>
+  </footer>
+</main>
+
+<!-- DETAIL SHEET -->
+<dialog class="sheet" id="sheet" aria-labelledby="sheetTitle">
+  <div class="sheet__head">
+    <div>
+      <p class="eyebrow" id="sheetBase"></p>
+      <h2 id="sheetTitle"></h2>
+    </div>
+    <button class="sheet__close" type="button" id="sheetClose">Close</button>
+  </div>
+  <div class="sheet__body">
+    <p id="sheetBlurb" style="color:var(--ink-soft)"></p>
+    <div class="sheet__meta" id="sheetMeta"></div>
+    <p class="eyebrow" style="margin-bottom:1rem">Profile — select a stage</p>
+    <div class="profile" id="sheetProfile" style="--chart-h: 140px; padding:1.1rem">
+      <div class="profile__readout">
+        <div>
+          <p class="eyebrow" data-stage-n></p>
+          <p class="profile__stage" data-stage-label></p>
+        </div>
+        <div class="profile__figs">
+          <p class="profile__m" data-metres></p>
+          <p class="profile__km" data-km></p>
+        </div>
+      </div>
+      <div class="profile__chart" role="group" aria-label="Elevation profile, select a stage" data-chart></div>
+      <div class="profile__axis"><span>Distance, km</span><span data-peak></span></div>
+    </div>
+    <p class="sheet__note" id="sheetNote"></p>
+  </div>
+</dialog>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const trails = [
+  { id:'kumara-parvatha', name:'Kumara Parvatha', base:'Kukke Subrahmanya', grade:'Hard',
+    distance:22, gain:1600, hours:'11–13', permit:true,
+    blurb:'Two false summits, then Shesha Parvatha. The forest section is short; most of the day is exposed grassland with no shade and no water.',
+    profile:[{km:0,m:120,label:'Kukke base'},{km:3,m:480,label:'Forest gate'},{km:6,m:940,label:'Bhattaru Mane'},{km:9,m:1180,label:'Forest check post'},{km:12,m:1490,label:'Shesha Parvatha'},{km:14,m:1380,label:'The dip'},{km:16,m:1712,label:'Summit'}] },
+  { id:'kodachadri', name:'Kodachadri', base:'Nittur', grade:'Moderate',
+    distance:12, gain:900, hours:'6–7', permit:true,
+    blurb:'Shola forest that opens into rolling grassland. Hidlumane falls sits on the route, which makes the first half slow and slippery in July.',
+    profile:[{km:0,m:380,label:'Nittur'},{km:2,m:560,label:'Hidlumane falls'},{km:4,m:820,label:'Rock scramble'},{km:6,m:1120,label:'Grassland edge'},{km:9,m:1290,label:'Sarvajna Peetha'},{km:11,m:1343,label:'Summit'}] },
+  { id:'tadiandamol', name:'Tadiandamol', base:'Kakkabe', grade:'Moderate',
+    distance:14, gain:750, hours:'6–8', permit:false,
+    blurb:"Coorg's highest point. A gentle approach through coffee estates, then a steep grass ridge that gets very windy after noon.",
+    profile:[{km:0,m:900,label:'Nalknad Palace'},{km:3,m:1040,label:'Estate track'},{km:6,m:1290,label:'Shola patch'},{km:9,m:1520,label:'Ridge line'},{km:12,m:1748,label:'Summit'}] },
+  { id:'bandaje', name:'Ballalarayana Durga to Bandaje', base:'Sunkasale', grade:'Hard',
+    distance:26, gain:1300, hours:'2 days', permit:true,
+    blurb:'A ridge traverse that ends at the top of Bandaje Arbi falls. Camping is only permitted with a forest department escort.',
+    profile:[{km:0,m:640,label:'Durgada Betta'},{km:5,m:1180,label:'Fort ruins'},{km:10,m:1310,label:'Ridge camp'},{km:16,m:1240,label:'Grass saddle'},{km:21,m:980,label:'Bandaje top'},{km:26,m:320,label:'Ujire descent'}] },
+  { id:'netravati', name:'Netravati Peak', base:'Yedakumeri', grade:'Hard',
+    distance:18, gain:1150, hours:'9–10', permit:true,
+    blurb:'Reached from the abandoned railway line at Yedakumeri. Route finding is genuinely hard in mist — a guide is not optional here.',
+    profile:[{km:0,m:400,label:'Rail line'},{km:4,m:690,label:'Stream crossing'},{km:8,m:1010,label:'Leech forest'},{km:12,m:1290,label:'Grass shoulder'},{km:16,m:1520,label:'Summit'}] },
+  { id:'kudremukh', name:'Kudremukh', base:'Mullodi', grade:'Moderate',
+    distance:20, gain:1100, hours:'8–9', permit:true,
+    blurb:'Named for a horse-face profile you can only see from the west. Three stream crossings, all of which rise fast after rain.',
+    profile:[{km:0,m:760,label:'Mullodi'},{km:4,m:940,label:'First stream'},{km:8,m:1180,label:'Ontimara'},{km:13,m:1440,label:'Final ridge'},{km:17,m:1894,label:'Summit'}] }
+];
+
+const gear = [
+  ['Ankle-height boots with a lugged sole','Laterite turns to grease. Trail runners will not hold on the descent.'],
+  ['Rain jacket, not a poncho','Ridge wind makes a poncho useless above 1,200 m.'],
+  ['Dettol or salt for leeches','June to September, every forest section. Assume forty a day.'],
+  ['Three litres of water','Grassland sections have no source once you leave the treeline.'],
+  ['Dry bag for phone and papers','Permits are checked at the gate and must still be legible.'],
+  ['Headlamp with spare cells','Light goes at 18:30 and descents routinely overrun.']
+];
+
+const faqs = [
+  ['Do I need a forest department permit?','For most routes inside a wildlife sanctuary, yes. Permits are issued at the range office on the morning of the trek and are capped daily, so arrive before 06:30. Bandaje and Netravati additionally require a registered guide.'],
+  ['Is the monsoon actually a good time to go?','It is the most beautiful and the most dangerous time. Streams rise within an hour of rain upstream, visibility on grassland drops to a few metres, and several routes close entirely in July. Go in September for the balance of green and safety.'],
+  ['How fit do I need to be?','A moderate route asks for six to eight hours of walking with 900 m of gain. If you can climb sixty flights of stairs without stopping and walk 12 km on a flat road, you are ready for moderate. Hard routes assume prior hill experience.'],
+  ['What happens if the weather turns on the ridge?','Turn around. Ridges are the worst place to be in a Western Ghats thunderstorm and there is no shelter above the treeline. Every itinerary here has a stated turnaround time — treat it as fixed, not as a target.']
+];
+
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const nf = new Intl.NumberFormat('en-IN');
+
+/* ============================================================
+   ELEVATION PROFILE
+   Bars are buttons in a tablist, so arrow keys walk the route.
+   ============================================================ */
+function mountProfile(root, points) {
+  const chart = $('[data-chart]', root);
+  const peak  = Math.max(...points.map(p => p.m));
+  const floor = Math.min(...points.map(p => p.m));
+  chart.innerHTML = '';
+
+  points.forEach((p, i) => {
+    const ratio = 0.14 + 0.86 * ((p.m - floor) / Math.max(peak - floor, 1));
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'col';
+    btn.setAttribute('aria-pressed', 'false');
+    btn.setAttribute('aria-label', `${p.label}, ${p.m} metres, ${p.km} kilometres in`);
+    btn.style.setProperty('--i', i);
+    btn.innerHTML =
+      `<span class="col__fill" style="--h:${(ratio * 100).toFixed(1)}%"></span>` +
+      `<span class="col__tick">${p.km}</span>`;
+    btn.addEventListener('click', () => select(i));
+    chart.append(btn);
+  });
+
+  chart.addEventListener('keydown', (e) => {
+    const step = { ArrowRight: 1, ArrowLeft: -1, Home: -Infinity, End: Infinity }[e.key];
+    if (step === undefined) return;
+    e.preventDefault();
+    const now = points.findIndex((_, i) => cols()[i].getAttribute('aria-pressed') === 'true');
+    const next = Math.max(0, Math.min(points.length - 1, now + step));
+    select(next);
+    cols()[next].focus();
+  });
+
+  const cols = () => $$('.col', chart);
+
+  function select(i) {
+    cols().forEach((c, j) => {
+      c.setAttribute('aria-pressed', String(j === i));
+      c.tabIndex = j === i ? 0 : -1;
+    });
+    const p = points[i];
+    $('[data-stage-n]', root).textContent = `Stage ${i + 1} of ${points.length}`;
+    $('[data-stage-label]', root).textContent = p.label;
+    $('[data-metres]', root).innerHTML = `${nf.format(p.m)}<span> m</span>`;
+    $('[data-km]', root).textContent = `${p.km} km in`;
+  }
+
+  $('[data-peak]', root).textContent = `Peak ${nf.format(peak)} m`;
+  select(points.length - 1);
+}
+
+/* ============================================================
+   TRAIL CARDS
+   ============================================================ */
+$('#grid').innerHTML = trails.map(t => `
+  <article class="card" data-id="${t.id}">
+    <div class="card__head">
+      <span class="eyebrow">${t.base}</span>
+      <span class="chip-grade" ${t.grade === 'Hard' ? 'data-hard' : ''}>${t.grade}</span>
+    </div>
+    <h3><button class="card__link" type="button">${t.name}<span class="sr-only"> — open route notes</span></button></h3>
+    <p class="card__blurb">${t.blurb}</p>
+    <div class="stats">
+      <div class="stat"><b>${t.distance}<span> km</span></b><small>Round trip</small></div>
+      <div class="stat"><b>${t.gain}<span> m</span></b><small>Ascent</small></div>
+      <div class="stat"><b>${t.hours}</b><small>On foot</small></div>
+    </div>
+    ${t.permit ? '<p class="card__permit">Forest permit required</p>' : ''}
+  </article>`).join('');
+
+/* ============================================================
+   GEAR + ACCORDION
+   ============================================================ */
+$('#gearList').innerHTML = gear.map(([item, why], i) => `
+  <li>
+    <span class="gear__n">${String(i + 1).padStart(2, '0')}</span>
+    <div><p class="gear__item">${item}</p><p class="gear__why">${why}</p></div>
+  </li>`).join('');
+
+$('#acc').innerHTML = faqs.map(([q, a], i) => `
+  <div class="acc__item" ${i === 0 ? 'data-open' : ''}>
+    <button class="acc__btn" type="button" aria-expanded="${i === 0}" aria-controls="acc-p${i}">
+      <span class="acc__q">${q}</span><span class="acc__mark"></span>
+    </button>
+    <div class="acc__panel" id="acc-p${i}"><div><p>${a}</p></div></div>
+  </div>`).join('');
+
+$('#acc').addEventListener('click', (e) => {
+  const btn = e.target.closest('.acc__btn');
+  if (!btn) return;
+  const item = btn.parentElement;
+  const open = item.hasAttribute('data-open');
+  $$('.acc__item', $('#acc')).forEach(i => {
+    i.removeAttribute('data-open');
+    $('.acc__btn', i).setAttribute('aria-expanded', 'false');
+  });
+  if (!open) {
+    item.setAttribute('data-open', '');
+    btn.setAttribute('aria-expanded', 'true');
+  }
+});
+
+/* ============================================================
+   TABS
+   ============================================================ */
+const tabs = $$('.tab');
+function showTab(tab) {
+  tabs.forEach(t => {
+    const on = t === tab;
+    t.setAttribute('aria-selected', String(on));
+    t.tabIndex = on ? 0 : -1;
+    $('#' + t.getAttribute('aria-controls')).hidden = !on;
+  });
+}
+tabs.forEach(t => t.addEventListener('click', () => showTab(t)));
+$('.tabs').addEventListener('keydown', (e) => {
+  const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+  if (!d) return;
+  e.preventDefault();
+  const i = tabs.indexOf(document.activeElement);
+  const next = tabs[(i + d + tabs.length) % tabs.length];
+  showTab(next); next.focus();
+});
+
+/* ============================================================
+   DIALOG
+   ============================================================ */
+const sheet = $('#sheet');
+function openTrail(t) {
+  $('#sheetBase').textContent = 'From ' + t.base;
+  $('#sheetTitle').textContent = t.name;
+  $('#sheetBlurb').textContent = t.blurb;
+  $('#sheetMeta').innerHTML = [
+    ['Grade', t.grade, t.grade === 'Hard'],
+    ['Round trip', t.distance + ' km'],
+    ['Ascent', t.gain + ' m'],
+    ['On foot', t.hours]
+  ].map(([l, v, alert]) =>
+    `<div><small>${l}</small><b${alert ? ' style="color:var(--laterite)"' : ''}>${v}</b></div>`).join('');
+  $('#sheetNote').textContent = t.permit
+    ? 'A forest department permit is required. Collect it at the range office before 06:30 on the day of the walk.'
+    : 'No permit required, but sign the estate register at the trailhead before you start.';
+  mountProfile($('#sheetProfile'), t.profile);
+  sheet.showModal();
+}
+$('#grid').addEventListener('click', (e) => {
+  const card = e.target.closest('.card');
+  if (card) openTrail(trails.find(t => t.id === card.dataset.id));
+  
+});
+$('#openFeatured').addEventListener('click', () => openTrail(trails[0]));
+$('#sheetClose').addEventListener('click', () => sheet.close());
+sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.close(); });
+
+/* ============================================================
+   FORM
+   ============================================================ */
+let picked = trails[0].id, group = 2;
+
+$('#chips').innerHTML = trails.map(t =>
+  `<button class="chip" type="button" data-id="${t.id}" aria-pressed="${t.id === picked}">${t.name}</button>`).join('');
+
+$('#chips').addEventListener('click', (e) => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  picked = chip.dataset.id;
+  $$('.chip').forEach(c => c.setAttribute('aria-pressed', String(c === chip)));
+  syncGuide(); clearReceipt();
+});
+
+function setGroup(n) {
+  group = Math.max(1, Math.min(12, n));
+  $('#group').textContent = group;
+  $('#minus').disabled = group <= 1;
+  $('#plus').disabled = group >= 12;
+  clearReceipt();
+}
+$('#minus').addEventListener('click', () => setGroup(group - 1));
+$('#plus').addEventListener('click', () => setGroup(group + 1));
+
+function syncGuide() {
+  const on = $('#guide').checked;
+  const t = trails.find(x => x.id === picked);
+  $('#guideText').textContent = on ? 'Registered guide included' : 'Self-guided';
+  const warn = $('#guideWarn');
+  const show = !on && t.grade === 'Hard';
+  warn.hidden = !show;
+  if (show) warn.textContent = `${t.name} is graded hard. Going without a guide is not permitted.`;
+}
+$('#guide').addEventListener('change', () => { syncGuide(); clearReceipt(); });
+
+function clearReceipt() { $('#receipt').hidden = true; }
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const checks = {
+  name:  v => v.trim().length >= 2 || 'Enter the name on your ID — the range office checks it.',
+  email: v => EMAIL.test(v) || 'Enter an address we can send the permit to.'
+};
+
+function validate(field, force) {
+  const input = $('#' + field);
+  const result = checks[field](input.value);
+  const bad = result !== true && (force || input.dataset.touched);
+  input.setAttribute('aria-invalid', String(Boolean(bad)));
+  $(`#${field}-err`).textContent = bad ? result : '';
+  return result === true;
+}
+['name', 'email'].forEach(f => {
+  const input = $('#' + f);
+  input.addEventListener('blur', () => { input.dataset.touched = '1'; validate(f); });
+  input.addEventListener('input', () => { if (input.dataset.touched) validate(f); clearReceipt(); });
+});
+
+$('#form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const ok = ['name', 'email'].map(f => validate(f, true)).every(Boolean);
+  const err = $('#formError');
+  err.hidden = ok;
+  if (!ok) { err.textContent = 'Two details are missing above. Fix those and send it again.'; return; }
+
+  const t = trails.find(x => x.id === picked);
+  const receipt = $('#receipt');
+  receipt.hidden = false;
+  receipt.innerHTML = `<b>Request sent</b><p>${group} ${group === 1 ? 'place' : 'places'} on ${t.name}` +
+    `${$('#guide').checked ? ' with a guide' : ''}. Confirmation goes to ${$('#email').value.trim()}.</p>`;
+});
+
+/* ============================================================
+   SCROLL STATE + REVEAL
+   ============================================================ */
+const bar = $('#bar');
+const onScroll = () => bar.toggleAttribute('data-scrolled', window.scrollY > 40);
+addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+}, { threshold: 0.12 });
+$$('.reveal').forEach(el => io.observe(el));
+
+/* Boot */
+$('#heroProfile [data-cap]').textContent = trails[0].name + ' · profile';
+mountProfile($('#heroProfile'), trails[0].profile);
+setGroup(2);
+syncGuide();
+</script>
+</body>
+</html>
