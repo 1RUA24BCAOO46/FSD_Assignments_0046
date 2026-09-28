@@ -1,0 +1,14 @@
+{
+  "name": "rn-web-express-starter",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix client && npm install --prefix server && npm install",
+    "dev": "concurrently -n WEB,API -c auto \"npm run web --prefix client\" \"npm run dev --prefix server\"",
+    "native": "npm run start --prefix client",
+    "android": "npm run android --prefix client",
+    "ios": "npm run ios --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
